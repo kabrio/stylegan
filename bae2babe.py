@@ -10,7 +10,6 @@ import dnnlib.tflib as tflib
 import config
 from encoder.generator_model import Generator
 import matplotlib.pyplot as plt
-%matplotlib inline
 import runway
 
 
