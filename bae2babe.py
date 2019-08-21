@@ -13,8 +13,6 @@ import matplotlib.pyplot as plt
 import runway
 
 
-
-
 @runway.setup(options={'checkpoint': runway.file(extension='.pkl')})
 def setup(opts):
 	# load direction
