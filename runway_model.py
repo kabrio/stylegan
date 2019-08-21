@@ -1,36 +1,56 @@
+# https://colab.research.google.com/drive/1RUaVUqCvyojwoMglp6cFoLDnCfLHBZtB#scrollTo=PVYrjvgE_8AU
+
+import helpers
+import os
 import pickle
+import PIL.Image
 import numpy as np
-import tensorflow as tf
+import dnnlib
 import dnnlib.tflib as tflib
+import config
+from encoder.generator_model import Generator
+import matplotlib.pyplot as plt
 import runway
 
-fmt = dict(func=tflib.convert_images_to_uint8, nchw_to_nhwc=True)
 
 @runway.setup(options={'checkpoint': runway.file(extension='.pkl')})
 def setup(opts):
-    global Gs
-    tflib.init_tf()
-    with open(opts['checkpoint'], 'rb') as file:
-        G, D, Gs = pickle.load(file)
-    return Gs
+	# load direction
+	global direction
+	age_direction = np.load('ffhq_dataset/latent_directions/age.npy')
+	direction = age_direction
+	# load latent representation
+	global latent_vector
+	r1 = 'latent_representations/j_01.npy'
+	latent_vector = np.load(r1)
+	# load checkpoint
+	tflib.init_tf()
+	with open(opts['checkpoint'], 'rb') as file:
+		G, D, Gs = pickle.load(file)
+	#age_direction = np.load('ffhq_dataset/latent_directions/age.npy')     
+	return Gs
+
 
 
 generate_inputs = {
-    'z': runway.vector(512, sampling_std=0.5),
-    'truncation': runway.number(min=0, max=1, default=0.8, step=0.01)
+	'age': runway.number(min=-6, max=6, default=6, step=0.1)
 }
 
 @runway.command('generate', inputs=generate_inputs, outputs={'image': runway.image})
-def convert(model, inputs):
-    z = inputs['z']
-    truncation = inputs['truncation']
-    latents = z.reshape((1, 512))
-    images = model.run(latents, None, truncation_psi=truncation, randomize_noise=False, output_transform=fmt)
-    output = np.clip(images[0], 0, 255).astype(np.uint8)
-    return {'image': output}
-
+def move_and_show(latent_vector, direction, inputs):
+	# generator
+	generator = Generator(model, batch_size=1, randomize_noise=False)
+	coeffs = inputs['age']
+	fig,ax = plt.subplots(1, len(coeffs), figsize=(15, 10), dpi=80)
+	for i, coeff in enumerate(coeffs):
+		new_latent_vector = latent_vector.copy()
+		new_latent_vector[:8] = (latent_vector + coeff*direction)[:8]
+		ax[i].imshow(generate_image(generator, new_latent_vector))
+		ax[i].set_title('Coeff: %0.1f' % coeff)
+	[x.axis('off') for x in ax]
+	#plt.show()
+	output = fig2data(plt)
+	return {'image': output}
 
 if __name__ == '__main__':
-    runway.run()
-
-# hi there
+	runway.run()
