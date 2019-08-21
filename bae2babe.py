@@ -1,5 +1,6 @@
 # https://colab.research.google.com/drive/1RUaVUqCvyojwoMglp6cFoLDnCfLHBZtB#scrollTo=PVYrjvgE_8AU
 
+import helpers
 import os
 import pickle
 import PIL.Image
@@ -49,39 +50,12 @@ def move_and_show(latent_vector, direction, inputs):
     for i, coeff in enumerate(coeffs):
         new_latent_vector = latent_vector.copy()
         new_latent_vector[:8] = (latent_vector + coeff*direction)[:8]
-        ax[i].imshow(generate_image(new_latent_vector))
+        ax[i].imshow(generate_image(generator, new_latent_vector))
         ax[i].set_title('Coeff: %0.1f' % coeff)
     [x.axis('off') for x in ax]
     #plt.show()
     output = fig2data(plt)
     return {'image': output}
-
-
-def generate_image(latent_vector):
-    latent_vector = latent_vector.reshape((1, 18, 512))
-    generator.set_dlatents(latent_vector)
-    img_array = generator.generate_images()[0]
-    img = PIL.Image.fromarray(img_array, 'RGB')
-    return img.resize((512, 512))    
-
-
-def fig2data ( fig ):
-    """
-    @brief Convert a Matplotlib figure to a 4D numpy array with RGBA channels and return it
-    @param fig a matplotlib figure
-    @return a numpy 3D array of RGBA values
-    """
-    # draw the renderer
-    fig.canvas.draw ( )
- 
-    # Get the RGBA buffer from the figure
-    w,h = fig.canvas.get_width_height()
-    buf = numpy.fromstring ( fig.canvas.tostring_argb(), dtype=numpy.uint8 )
-    buf.shape = ( w, h,4 )
- 
-    # canvas.tostring_argb give pixmap in ARGB mode. Roll the ALPHA channel to have it in RGBA mode
-    buf = numpy.roll ( buf, 3, axis = 2 )
-    return buf
 
 if __name__ == '__main__':
     runway.run()
