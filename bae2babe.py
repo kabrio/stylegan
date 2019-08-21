@@ -26,7 +26,6 @@ def setup(opts):
 	r1 = 'latent_representations/j_01.npy'
 	latent_vector = np.load(r1)
 	# load checkpoint
-    global Gs
     tflib.init_tf()
     with open(opts['checkpoint'], 'rb') as file:
         G, D, Gs = pickle.load(file)
