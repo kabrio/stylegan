@@ -1,4 +1,4 @@
-entrypoint: python runway_model.py
+entrypoint: python bae2babe.py
 python: 3.6
 framework: tensorflow
 cuda: 9.0
@@ -9,4 +9,5 @@ files:
   ignore:
     - checkpoints/*
 build_steps:
+  - pip install Pillow
   - pip install -r requirements.txt
