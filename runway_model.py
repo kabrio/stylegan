@@ -36,7 +36,7 @@ generate_inputs = {
 	'age': runway.number(min=-6, max=6, default=6, step=0.1)
 }
 
-@runway.command('generate', inputs=generate_inputs, outputs={'image': runway.image})
+@runway.command('generat3', inputs=generate_inputs, outputs={'image': runway.image})
 def move_and_show(latent_vector, direction, inputs):
 	# generator
 	generator = Generator(model, batch_size=1, randomize_noise=False)
