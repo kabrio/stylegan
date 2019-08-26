@@ -12,10 +12,11 @@ from encoder.generator_model import Generator
 import matplotlib.pyplot as plt
 import runway
 
+fmt = dict(func=tflib.convert_images_to_uint8, nchw_to_nhwc=True)
 
 @runway.setup
 def setup(opts):
-	global generator
+	global Gs
 	tflib.init_tf()
 	url = 'https://drive.google.com/uc?id=1MEGjdvVpUsu1jB4zrXZN7Y4kBBOzizDQ' # karras2019stylegan-ffhq-1024x1024.pkl
 	with dnnlib.util.open_url(url, cache_dir=config.cache_dir) as f:
@@ -24,8 +25,11 @@ def setup(opts):
 		# _D = Instantaneous snapshot of the discriminator. Mainly useful for resuming a previous training run.
 		# Gs = Long-term average of the generator. Yields higher-quality results than the instantaneous snapshot.
 	Gs.print_layers()
-	generator = Generator(model, batch_size=1, randomize_noise=False)
-	return generator
+	return Gs
+
+
+# generator = Generator(model, batch_size=1, randomize_noise=False)
+
 
 def generate_image(generator, latent_vector):
 	latent_vector = latent_vector.reshape((1, 18, 512))
@@ -43,7 +47,7 @@ generate_outputs = {
 }
 
 @runway.command('generat3', inputs=generate_inputs, outputs=generate_outputs)
-def move_and_show(args):
+def move_and_show(model, args):
 	# load direction
 	age_direction = np.load('ffhq_dataset/latent_directions/age.npy')
 	direction = age_direction
@@ -54,10 +58,10 @@ def move_and_show(args):
 	coeff = inputs['age']
 	new_latent_vector = latent_vector.copy()
 	new_latent_vector[:8] = (latent_vector + coeff*direction)[:8]
-	image = (generate_image(generator, new_latent_vector))
-	#ax[i].set_title('Coeff: %0.1f' % coeff)
-	#plt.show()
-	return {'image': image}
+	#image = (generate_image(generator, new_latent_vector))
+    images = model.run(new_latent_vector, None, truncation_psi=0.8, randomize_noise=False, output_transform=fmt)
+    output = np.clip(images[0], 0, 255).astype(np.uint8)
+    return {'image': output}
 
 if __name__ == '__main__':
 	runway.run(debug=True)
