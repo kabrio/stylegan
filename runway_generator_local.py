@@ -33,7 +33,7 @@ generate_inputs = {
 	'age': runway.number(min=-6, max=6, default=6, step=0.1)
 }
 
-@runway.command('generat3', inputs=generate_inputs, outputs={'image': runway.image})
+@runway.command('generatorrr', inputs=generate_inputs, outputs={'image': runway.image})
 def move_and_show(model, inputs):
 	# load latent representation
 	r1 = 'latent_representations/j_01.npy'
@@ -43,12 +43,14 @@ def move_and_show(model, inputs):
 	# generator
 	# generator = Generator(model, batch_size=1, randomize_noise=False)
 	coeff = inputs['age']
+	generator = Generator(model, batch_size=1, randomize_noise=False)
+	fig,ax = plt.subplots(1, len(coeffs), figsize=(15, 10), dpi=80)
 	new_latent_vector = latent_vector.copy()
 	new_latent_vector[:8] = (latent_vector + coeff*direction)[:8]
-	new_latent_vector = new_latent_vector.reshape((1, 18, 512))
-	model.set_dlatents(new_latent_vector)
-	images = model.run(new_latent_vector, None, truncation_psi=0.8, randomize_noise=False, output_transform=fmt)
-	output = np.clip(images[0], 0, 255).astype(np.uint8)
+	ax[i].imshow(generate_image(generator, new_latent_vector))
+	ax[i].set_title('Coeff: %0.1f' % coeff)
+	[x.axis('off') for x in ax]
+	output = fig2data(plt)
 	return {'image': output}
 
 if __name__ == '__main__':
