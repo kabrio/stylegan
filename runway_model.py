@@ -52,7 +52,6 @@ def move_and_show(model, args):
 	# generator
 	generator = Generator(model, batch_size=1, randomize_noise=False)
 	coeff = inputs['age']
-	fig,ax = plt.subplots(1, 1, figsize=(15, 10), dpi=80)
 	new_latent_vector = latent_vector.copy()
 	new_latent_vector[:8] = (latent_vector + coeff*direction)[:8]
 	image = (generate_image(generator, new_latent_vector))
