@@ -31,12 +31,12 @@ def setup(opts):
 # generator = Generator(model, batch_size=1, randomize_noise=False)
 
 
-def generate_image(generator, latent_vector):
-	latent_vector = latent_vector.reshape((1, 18, 512))
-	generator.set_dlatents(latent_vector)
-	img_array = generator.generate_images()[0]
-	img = PIL.Image.fromarray(img_array, 'RGB')
-	return img.resize((512, 512))   
+# def generate_image(generator, latent_vector):
+# 	latent_vector = latent_vector.reshape((1, 18, 512))
+# 	generator.set_dlatents(latent_vector)
+# 	img_array = generator.generate_images()[0]
+# 	img = PIL.Image.fromarray(img_array, 'RGB')
+# 	return img.resize((512, 512))   
 
 generate_inputs = {
 	'age': runway.number(min=-6, max=6, default=6, step=0.1)
@@ -55,7 +55,7 @@ def move_and_show(model, args):
 	r1 = 'latent_representations/j_01.npy'
 	latent_vector = np.load(r1)
 	# generator
-	coeff = inputs['age']
+	coeff = 6
 	new_latent_vector = latent_vector.copy()
 	new_latent_vector[:8] = (latent_vector + coeff*direction)[:8]
 	#image = (generate_image(generator, new_latent_vector))
