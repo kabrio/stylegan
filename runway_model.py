@@ -60,8 +60,8 @@ def move_and_show(model, args):
 	new_latent_vector[:8] = (latent_vector + coeff*direction)[:8]
 	#image = (generate_image(generator, new_latent_vector))
 	images = model.run(new_latent_vector, None, truncation_psi=0.8, randomize_noise=False, output_transform=fmt)
-    output = np.clip(images[0], 0, 255).astype(np.uint8)
-    return {'image': output}
+	output = np.clip(images[0], 0, 255).astype(np.uint8)
+	return {'image': output}
 
 if __name__ == '__main__':
 	runway.run(debug=True)
