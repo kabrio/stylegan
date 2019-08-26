@@ -32,8 +32,8 @@ class Generator:
 		try:
 			self.dlatent_variable = next(v for v in tf.global_variables() if 'learnable_dlatents' in v.name)
 		except RuntimeError:
-			print "RuntimeError in next dlatent_variable"
-			
+			print ("RuntimeError in next dlatent_variable")
+
 		self.set_dlatents(self.initial_dlatents)
 
 		self.generator_output = self.graph.get_tensor_by_name('G_synthesis_1/_Run/concat:0')
