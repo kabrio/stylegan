@@ -26,13 +26,22 @@ def setup(opts):
 	Gs.print_layers()
 	return Gs
 
-
+def generate_image(generator, latent_vector):
+	latent_vector = latent_vector.reshape((1, 18, 512))
+	generator.set_dlatents(latent_vector)
+	img_array = generator.generate_images()[0]
+	img = PIL.Image.fromarray(img_array, 'RGB')
+	return img.resize((512, 512))   
 
 generate_inputs = {
 	'age': runway.number(min=-6, max=6, default=6, step=0.1)
 }
 
-@runway.command('generat3', inputs=generate_inputs, outputs={'image': runway.image})
+generate_outputs = {
+	'image': runway.image
+}
+
+@runway.command('generat3', inputs=generate_inputs, outputs=generate_outputs)
 def move_and_show(model, args):
 	# load direction
 	age_direction = np.load('ffhq_dataset/latent_directions/age.npy')
@@ -52,4 +61,4 @@ def move_and_show(model, args):
 	return {'image': image}
 
 if __name__ == '__main__':
-	runway.run()
+	runway.run(debug=True)
